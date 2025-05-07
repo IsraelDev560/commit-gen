@@ -4,10 +4,28 @@ import { execSync } from 'child_process';
 import { generateCommit } from './ai.js';
 import PromptSync from 'prompt-sync';
 
-const diff = execSync('git diff').toString();
+const diff = execSync('git diff --cached').toString();
 const prompt = PromptSync();
-if (!diff.trim()) console.log("❌ No staged changes found. Use 'git add' first."), process.exit(0);
+if (!diff.trim()) {
+    const question = prompt("❌ No staged changes found. You want git add ?(yes/no): ");
+    if (!question === 'yes') {
+
+    }
+    execSync('git add .');
+    await runCommitGenius();
+}
 else {
+    runCommitGenius();
+}
+
+function questionUser() {
+    const list = ['yes', 'no', 'regenerate', 'edit']
+    const question = prompt("Do you proceed? ")
+    const valid = list.includes(question)
+    return { question, valid }
+}
+
+async function runCommitGenius() {
     let valid = false;
     let answer, res = await generateCommit(diff)
     do {
@@ -38,11 +56,4 @@ else {
                 console.log("Leaving...")
         }
     }
-}
-
-function questionUser() {
-    const list = ['yes', 'no', 'regenerate', 'edit']
-    const question = prompt("Do you proceed? ")
-    const valid = list.includes(question)
-    return { question, valid }
 }
