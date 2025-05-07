@@ -9,7 +9,7 @@ const openai = new OpenAI({
 
 export async function generateCommitOpenAI(diff) {
     const prompt =
-        "Você é um assistente de versionamento. Gere uma mensagem de commit clara e objetiva com base nas alterações abaixo, seguindo o padrão Conventional Commits, Gere somente a linha de assunto do commit, no formato Conventional Commits, sem texto adicional.:\n\n" +
+        "You are a versioning wizard. Generate a clear and objective commit message based on the changes below, following the Conventional Commits pattern. Generate only the commit subject line, in Conventional Commits format, without additional text.:\n\n" +
         diff;
     try {
         const res = await openai.chat.completions.create({
