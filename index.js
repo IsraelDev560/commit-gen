@@ -6,76 +6,107 @@ import PromptSync from 'prompt-sync';
 const prompt = PromptSync();
 
 function safePrompt(question) {
-    const answer = prompt(question);
-    return answer == null ? '' : answer.trim().toLowerCase();
-  }
+  const answer = prompt(question);
+  return answer == null ? '' : answer.trim().toLowerCase();
+}
 
-function doCommit(message) {
+const msgs = {
+  en: {
+    welcome: "🚀 Welcome to Commit Genius CLI!",
+    chooseLang: "Choose language / Escolher idioma (en/pt): ",
+    noDiff: "❌ No staged changes found.",
+    addPrompt: "Do you want to run 'git add .'? (yes/no): ",
+    commitSuggested: "💡 Commit suggested:",
+    approve: "Do you approve? (yes/no/regenerate/edit): ",
+    abort: "🚫 Commit aborted.",
+    validOpts: "Valid options: yes, no, regenerate, edit",    
+    writeCommit: "✍️ Write your commit message: ",
+    commitSuccess: "✅ Commit made!",
+    commitFail: "❌ Failed to commit:",
+    genError: "❌ Error generating commit:",
+    unexpected: "❌ Unexpected error:",
+    leaving: "Leaving..."
+  },
+  pt: {
+    welcome: "🚀 Bem-vindo ao Commit Genius CLI!",
+    chooseLang: "Escolha o idioma / Choose language (pt/en): ",
+    noDiff: "❌ Nenhuma alteração em staging encontrada.",
+    addPrompt: "Deseja executar 'git add .'? (sim/não): ",
+    commitSuggested: "💡 Commit sugerido:",
+    approve: "Você aprova? (sim/não/regenerar/editar): ",
+    abort: "🚫 Commit abortado.",
+    validOpts: "Opções válidas: sim, não, regenerar, editar",    
+    writeCommit: "✍️ Escreva sua mensagem de commit: ",
+    commitSuccess: "✅ Commit efetuado!",
+    commitFail: "❌ Falha ao commitar:",
+    genError: "❌ Erro ao gerar commit:",
+    unexpected: "❌ Erro inesperado:",
+    leaving: "Saindo..."
+  }
+};
+
+async function doCommit(message, labels) {
   try {
     execSync(`git commit -m ${JSON.stringify(message)}`, { stdio: 'inherit' });
-    console.log("✅ Commit made!");
+    console.log(labels.commitSuccess);
   } catch (err) {
-    console.error("❌ Failed to commitar:", err.message);
+    console.error(labels.commitFail, err.message);
     process.exit(1);
   }
 }
 
-async function runCommitGenius(diff) {
+async function runCommitGenius(diff, labels) {
   try {
     let res = await generateCommit(diff);
     while (true) {
-      console.log("\n💡 Commit suggested:\n", res, "\n");
-      const answer = prompt("You approve? (yes/no/regenerate/edit): ")
-        .trim()
-        .toLowerCase();
-
+      console.log(`\n${labels.commitSuggested}\n`, res, "\n");
+      const answer = safePrompt(labels.approve);
       switch (answer) {
-        case 'yes':
-          doCommit(res);
+        case 'yes': case 'sim':
+          await doCommit(res, labels);
           return;
-
-        case 'no':
-          console.log('🚫 Abort commit.');
+        case 'no': case 'não':
+          console.log(labels.abort);
           return;
-
-        case 'regenerate':
+        case 'regenerate': case 'regenerar':
           res = await generateCommit(diff);
           break;
-
-        case 'edit':
-          const manual = prompt("✍️ Write your commit message: ").trim();
-          doCommit(manual);
+        case 'edit': case 'editar':
+          const manual = prompt(labels.writeCommit) || '';
+          await doCommit(manual.trim(), labels);
           return;
-
         default:
-          console.log("Valid options: yes, no, regenerate, edit");
+          console.log(labels.validOpts);
       }
     }
   } catch (err) {
-    console.error("❌ Error to generate commit:", err.message);
+    console.error(labels.genError, err.message);
     process.exit(1);
   }
 }
 
 async function main() {
+  console.log(msgs.en.welcome);
+  const langInput = safePrompt(msgs.en.chooseLang);
+  const lang = langInput.startsWith('pt') ? 'pt' : 'en';
+  const labels = msgs[lang];
+  console.log(labels.welcome);
+
   try {
     const diff = execSync('git diff --cached').toString();
-
     if (!diff.trim()) {
-      const ans = safePrompt("❌ No staged changes. Do you want to run 'git add .'? (yes/no): ")
-        .trim()
-        .toLowerCase();
-      if (ans === 'yes') {
+      console.log(labels.noDiff);
+      const ans = safePrompt(labels.addPrompt);
+      if (ans === 'yes' || ans === 'sim') {
         execSync('git add .', { stdio: 'inherit' });
       } else {
-        console.log("Leaving...");
+        console.log(labels.leaving);
         process.exit(0);
       }
     }
-
-    await runCommitGenius(diff);
+    await runCommitGenius(execSync('git diff --cached').toString(), labels);
   } catch (err) {
-    console.error("❌ Error unexpected:", err.message);
+    console.error(labels.unexpected, err.message);
     process.exit(1);
   }
 }
