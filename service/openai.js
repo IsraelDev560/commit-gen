@@ -9,7 +9,7 @@ const openai = new OpenAI({
 
 export async function generateCommitOpenAI(diff) {
     const prompt =
-        "Você é um assistente de versionamento. Gere uma mensagem de commit clara e objetiva com base nas alterações abaixo, seguindo o padrão Conventional Commits:\n\n" +
+        "Você é um assistente de versionamento. Gere uma mensagem de commit clara e objetiva com base nas alterações abaixo, seguindo o padrão Conventional Commits, Gere somente a linha de assunto do commit, no formato Conventional Commits, sem texto adicional.:\n\n" +
         diff;
     try {
         const res = await openai.chat.completions.create({
@@ -18,6 +18,7 @@ export async function generateCommitOpenAI(diff) {
         })
 
         console.log(res.choices[0].message.content)
+        return res.choices[0].message.content;
     } catch (error) {
         console.log("Ocorrued error: " + error);
     }
