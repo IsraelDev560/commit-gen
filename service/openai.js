@@ -9,8 +9,8 @@ const openai = new OpenAI({
 
 export async function generateCommitOpenAI(diff, lang) {
     const promptText = lang === 'pt'
-    ? 'Você é um mago de versionamento. Gere uma mensagem de commit clara e objetiva baseada nas mudanças abaixo, seguindo o padrão Conventional Commits. Retorne apenas a linha de assunto:'
-    : 'You are a versioning wizard. Generate a clear and objective commit message based on the changes below, following the Conventional Commits pattern. Return only the subject line:';
+    ? 'Você é um mago de versionamento. Gere uma mensagem de commit clara baseada nas mudanças abaixo, seguindo o padrão Conventional Commits. Retorne apenas a linha de assunto:'
+    : 'You are a versioning wizard. Generate a clear commit message based on the changes below, following the Conventional Commits pattern. Return only the subject line:';
         diff;
     try {
         const res = await openai.chat.completions.create({

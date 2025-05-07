@@ -6,18 +6,18 @@ const openai = new OpenAI({
     apiKey: DEEPSEEK_API_KEY
 })
 
-export async function generateCommitDeepSeekAI(diff) {
-    const prompt =
-    "Você é um assistente de versionamento. Gere uma mensagem de commit clara e objetiva com base nas alterações abaixo, seguindo o padrão Conventional Commits:\n\n" +
-    diff;
+export async function generateCommitDeepSeekAI(diff, lang) {
+    const promptText = lang === 'pt'
+        ? 'Você é um mago de versionamento. Gere uma mensagem de commit clara baseada nas mudanças abaixo, seguindo o padrão Conventional Commits. Retorne apenas a linha de assunto:'
+        : 'You are a versioning wizard. Generate a clear commit message based on the changes below, following the Conventional Commits pattern. Return only the subject line:';
 
     try {
         const res = await openai.chat.completions.create({
-            messages: [{ role: 'system', content: prompt }],
+            messages: [{ role: 'system', content: `${promptText}\n\n${diff}` }],
             model: "deepseek-chat"
         })
 
-        console.log(res.choices[0].message.content)
+        return res.choices[0].message.content;
     } catch (error) {
         console.log("Ocorrued error: " + error);
     }
