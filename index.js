@@ -55,9 +55,9 @@ async function doCommit(message, labels) {
   }
 }
 
-async function runCommitGenius(diff, labels) {
+async function runCommitGenius(diff, labels, lang) {
   try {
-    let res = await generateCommit(diff);
+    let res = await generateCommit(diff, lang);
     while (true) {
       console.log(`\n${labels.commitSuggested}\n`, res, "\n");
       const answer = safePrompt(labels.approve);
@@ -69,7 +69,7 @@ async function runCommitGenius(diff, labels) {
           console.log(labels.abort);
           return;
         case 'regenerate': case 'regenerar':
-          res = await generateCommit(diff);
+          res = await generateCommit(diff, lang);
           break;
         case 'edit': case 'editar':
           const manual = prompt(labels.writeCommit) || '';
@@ -104,7 +104,8 @@ async function main() {
         process.exit(0);
       }
     }
-    await runCommitGenius(execSync('git diff --cached').toString(), labels);
+    const latestDiff = execSync('git diff --cached').toString();
+    await runCommitGenius(latestDiff, labels, lang);
   } catch (err) {
     console.error(labels.unexpected, err.message);
     process.exit(1);

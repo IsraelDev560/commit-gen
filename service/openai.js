@@ -7,17 +7,17 @@ const openai = new OpenAI({
     apiKey: GPT_API_KEY
 })
 
-export async function generateCommitOpenAI(diff) {
-    const prompt =
-        "You are a versioning wizard. Generate a clear and objective commit message based on the changes below, following the Conventional Commits pattern. Generate only the commit subject line, in Conventional Commits format, without additional text.:\n\n" +
+export async function generateCommitOpenAI(diff, lang) {
+    const promptText = lang === 'pt'
+    ? 'Você é um mago de versionamento. Gere uma mensagem de commit clara e objetiva baseada nas mudanças abaixo, seguindo o padrão Conventional Commits. Retorne apenas a linha de assunto:'
+    : 'You are a versioning wizard. Generate a clear and objective commit message based on the changes below, following the Conventional Commits pattern. Return only the subject line:';
         diff;
     try {
         const res = await openai.chat.completions.create({
-            messages: [{ role: 'system', content: prompt }],
+            messages: [{ role: 'system', content: `${promptText}\n\n${diff}` }],
             model: 'chatgpt-4o-latest'
         })
 
-        console.log(res.choices[0].message.content)
         return res.choices[0].message.content;
     } catch (error) {
         console.log("Ocorrued error: " + error);
