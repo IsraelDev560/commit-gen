@@ -8,8 +8,9 @@ const diff = execSync('git diff --cached').toString();
 const prompt = PromptSync();
 if (!diff.trim()) {
     const question = prompt("❌ No staged changes found. You want git add ?(yes/no): ");
-    if (!question === 'yes') {
-
+    if (question !== 'yes') {
+        console.log("leaving...")
+        process.emit(0)
     }
     execSync('git add .');
     await runCommitGenius();
