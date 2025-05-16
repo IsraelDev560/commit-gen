@@ -14,12 +14,13 @@ const msgs = {
   en: {
     welcome: "🚀 Welcome to Commit Genius CLI!",
     chooseLang: "Choose language / Escolher idioma (en/pt): ",
+    chooseModel: "Choose model AI / Escolha o modelo da IA(openai/deepseek): ",
     noDiff: "❌ No staged changes found.",
     addPrompt: "Do you want to run 'git add .'? (yes/no): ",
     commitSuggested: "💡 Commit suggested:",
     approve: "Do you approve? (yes/no/regenerate/edit): ",
     abort: "🚫 Commit aborted.",
-    validOpts: "Valid options: yes, no, regenerate, edit",    
+    validOpts: "Valid options: yes, no, regenerate, edit",
     writeCommit: "✍️ Write your commit message: ",
     commitSuccess: "✅ Commit made!",
     commitFail: "❌ Failed to commit:",
@@ -30,12 +31,13 @@ const msgs = {
   pt: {
     welcome: "🚀 Bem-vindo ao Commit Genius CLI!",
     chooseLang: "Escolha o idioma / Choose language (pt/en): ",
+    chooseModel: "Escolha o modelo da IA / Choose model AI(openai/deepseek): ",
     noDiff: "❌ Nenhuma alteração em staging encontrada.",
     addPrompt: "Deseja executar 'git add .'? (sim/não): ",
     commitSuggested: "💡 Commit sugerido:",
     approve: "Você aprova? (sim/não/regenerar/editar): ",
     abort: "🚫 Commit abortado.",
-    validOpts: "Opções válidas: sim, não, regenerar, editar",    
+    validOpts: "Opções válidas: sim, não, regenerar, editar",
     writeCommit: "✍️ Escreva sua mensagem de commit: ",
     commitSuccess: "✅ Commit efetuado!",
     commitFail: "❌ Falha ao commitar:",
@@ -55,9 +57,9 @@ async function doCommit(message, labels) {
   }
 }
 
-async function runCommitGenius(diff, labels, lang) {
+async function runCommitGenius(diff, labels, lang, model) {
   try {
-    let res = await generateCommit(diff, lang);
+    let res = await generateCommit(diff, lang, model);
     while (true) {
       console.log(`\n${labels.commitSuggested}\n`, res, "\n");
       const answer = safePrompt(labels.approve);
@@ -69,7 +71,7 @@ async function runCommitGenius(diff, labels, lang) {
           console.log(labels.abort);
           return;
         case 'regenerate': case 'regenerar':
-          res = await generateCommit(diff, lang);
+          res = await generateCommit(diff, lang, model);
           break;
         case 'edit': case 'editar':
           const manual = prompt(labels.writeCommit) || '';
@@ -90,6 +92,9 @@ async function main() {
   const langInput = safePrompt(msgs.en.chooseLang);
   const lang = langInput.startsWith('pt') ? 'pt' : 'en';
   const labels = msgs[lang];
+  const modelInput = safePrompt(labels.chooseModel);
+  const model = modelInput.startsWith('openai') ? 'openai' : 'deepseek';
+  console.log(model);
   console.log(labels.welcome);
 
   try {
@@ -105,7 +110,7 @@ async function main() {
       }
     }
     const latestDiff = execSync('git diff --cached').toString();
-    await runCommitGenius(latestDiff, labels, lang);
+    await runCommitGenius(latestDiff, labels, lang, model);
   } catch (err) {
     console.error(labels.unexpected, err.message);
     process.exit(1);
