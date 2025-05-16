@@ -122,7 +122,8 @@ O CLI usa a variável de ambiente `OPENAI_API_KEY` para autenticar chamadas à A
    commit-gen      # ou `npm run commit`
    ```
 3. **Escolha o idioma** (`pt` ou `en`) na primeira execução.
-4. **Aja conforme as opções** exibidas:
+4. **Escolha o modelo** (`openai/deepseek`)
+5. **Aja conforme as opções** exibidas:
 
    * **yes/sim**: aceita e faz o commit.
    * **no/não**: aborta.

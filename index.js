@@ -14,7 +14,8 @@ const msgs = {
   en: {
     welcome: "🚀 Welcome to Commit Genius CLI!",
     chooseLang: "Choose language / Escolher idioma (en/pt): ",
-    chooseModel: "Choose model AI / Escolha o modelo da IA(openai/deepseek): ",
+    chooseModel: "Choose model AI (openai/deepseek): ",
+    modelSelected: "Model Selected:",
     noDiff: "❌ No staged changes found.",
     addPrompt: "Do you want to run 'git add .'? (yes/no): ",
     commitSuggested: "💡 Commit suggested:",
@@ -31,7 +32,8 @@ const msgs = {
   pt: {
     welcome: "🚀 Bem-vindo ao Commit Genius CLI!",
     chooseLang: "Escolha o idioma / Choose language (pt/en): ",
-    chooseModel: "Escolha o modelo da IA / Choose model AI(openai/deepseek): ",
+    chooseModel: "Escolha o modelo da IA (openai/deepseek): ",
+    modelSelected: "Modelo Selecionado:",
     noDiff: "❌ Nenhuma alteração em staging encontrada.",
     addPrompt: "Deseja executar 'git add .'? (sim/não): ",
     commitSuggested: "💡 Commit sugerido:",
@@ -94,9 +96,7 @@ async function main() {
   const labels = msgs[lang];
   const modelInput = safePrompt(labels.chooseModel);
   const model = modelInput.startsWith('openai') ? 'openai' : 'deepseek';
-  console.log(model);
-  console.log(labels.welcome);
-
+  console.log(labels.modelSelected, model);
   try {
     const diff = execSync('git diff --cached').toString();
     if (!diff.trim()) {
