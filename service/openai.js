@@ -15,7 +15,7 @@ export async function generateCommitOpenAI(diff, lang) {
     try {
         const res = await openai.chat.completions.create({
             messages: [{ role: 'system', content: `${promptText}\n\n${diff}` }],
-            model: 'chatgpt-4o-latest'
+            model: 'gpt-3.5-turbo'
         })
 
         return res.choices[0].message.content;
