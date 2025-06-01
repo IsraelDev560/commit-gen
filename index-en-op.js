@@ -13,7 +13,7 @@ function safePrompt(question) {
 const msgs =
 {
   welcome: "🚀 Welcome to Commit Genius CLI!",
-  modelSelected: "Model Selected: OpenAi",
+  modelSelected: "Model Selected:",
   noDiff: "❌ No staged changes found.",
   addPrompt: "Do you want to run 'git add .'? (yes/no): ",
   commitSuggested: "💡 Commit suggested:",
@@ -85,7 +85,7 @@ async function main() {
       }
     }
     const latestDiff = execSync('git diff --cached').toString();
-    await runCommitGenius(latestDiff, labels, lang, model);
+    await runCommitGenius(latestDiff, labels, 'en', 'openai');
   } catch (err) {
     console.error(labels.unexpected, err.message);
     process.exit(1);
