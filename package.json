@@ -18,5 +18,11 @@
     "dotenv": "^16.5.0",
     "openai": "^4.95.1",
     "prompt-sync": "^4.2.0"
+  },
+  "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.3",
+    "semantic-release": "^24.2.5"
   }
 }
